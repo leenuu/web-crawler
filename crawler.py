@@ -6,12 +6,13 @@ import os
 import requests
 import webbrowser
 
-def req(event):
+def req_btn():
     src = str(req_entry.get())
     options = webdriver.ChromeOptions()
     options.add_argument('headless')
     options.add_argument('window-size=1920x1080')
     options.add_argument("disable-gpu")
+    options.add_argument("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
 
     driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
     driver.implicitly_wait(3)
@@ -46,6 +47,50 @@ def req(event):
         for i in range(0,data_len):
             res_label[i].config(text=data[i])
             res_btn[i].config(state="normal")
+
+def req(event):
+    src = str(req_entry.get())
+    options = webdriver.ChromeOptions()
+    options.add_argument('headless')
+    options.add_argument('window-size=1920x1080')
+    options.add_argument("disable-gpu")
+    options.add_argument("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
+
+    driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
+    driver.implicitly_wait(3)
+    driver.get('https://google.com')
+    driver.find_element_by_name('q').send_keys(src)
+    driver.find_element_by_name('btnK').click()
+
+    # url = 'https://www.google.com/search?q=' + src
+
+    # req_html = requests.get(url)
+    html = driver.page_source
+    soup = BeautifulSoup(html, 'html.parser')
+    data_url = list()
+    data = list()
+    # data = soup.find_all('a') and soup.find_all('h3')
+
+    # print(data)
+    for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3'):
+        if link.get_text().find(src) == 0:
+            data_url.append(link.parent.get('href'))
+            data.append(link.get_text())
+
+    data_len = len(data)
+
+    if data_len > 5 :
+        res_label_reset()
+        for i in range(0,5):
+            res_label[i].config(text=data[i])
+            res_btn[i].config(state="normal")
+    elif data_len <= 5:
+        res_label_reset()
+        for i in range(0,data_len):
+            res_label[i].config(text=data[i])
+            res_btn[i].config(state="normal")
+
+
         
     # # driver.close()
     # with open('req.txt', 'w', encoding='utf-8') as make_file:
@@ -71,7 +116,7 @@ req_entry = tkinter.Entry(win)
 req_entry.bind("<Return>",req)
 req_entry.pack()
 
-req_btn = tkinter.Button(win, text="검색", overrelief="solid", command=req, repeatdelay=1000, repeatinterval=100)
+req_btn = tkinter.Button(win, text="검색", overrelief="solid", command=req_btn, repeatdelay=1000, repeatinterval=100)
 req_btn.pack()
 
 for i in range(0, 5):

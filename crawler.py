@@ -34,39 +34,56 @@ def req(event):
         for i in range(0,5):
             if i == 0:
                 res_label_1.config(text=data[i])
+                res_btn_1.config(state="normal")
             elif i == 1:
                 res_label_2.config(text=data[i])
+                res_btn_2.config(state="normal")
             elif i == 2:
                 res_label_3.config(text=data[i])
+                res_btn_3.config(state="normal")
             elif i == 3:
                 res_label_4.config(text=data[i])
+                res_btn_4.config(state="normal")
             elif i == 4:
                 res_label_5.config(text=data[i])
+                res_btn_5.config(state="normal")
     elif data_len <= 5:
         res_label_reset()
         for i in range(0,data_len):
             if i == 0:
                 res_label_1.config(text=data[i])
+                res_btn_1.config(state="normal")
             elif i == 1:
                 res_label_2.config(text=data[i])
+                res_btn_2.config(state="normal")
             elif i == 2:
                 res_label_3.config(text=data[i])
+                res_btn_3.config(state="normal")
             elif i == 3:
                 res_label_4.config(text=data[i])
+                res_btn_3.config(state="normal")
             elif i == 4:
                 res_label_5.config(text=data[i])
+                res_btn_5.config(state="normal")
         
     # # driver.close()
     # with open('req.txt', 'w', encoding='utf-8') as make_file:
     #     make_file.write(data)
 
 def res_label_reset():
-    res_label_2.config(text='')
     res_label_1.config(text='')
+    res_btn_1.config(state="disabled")
+    res_label_2.config(text='')
+    res_btn_2.config(state="disabled")
     res_label_3.config(text='')
+    res_btn_3.config(state="disabled")
     res_label_4.config(text='')
+    res_btn_4.config(state="disabled")
     res_label_5.config(text='')
+    res_btn_5.config(state="disabled")
 
+# btn_1_state = "normal"
+# state_dis = "disabled"
 
 win = tkinter.Tk()
 win.title("web crawler")
@@ -77,23 +94,39 @@ req_entry = tkinter.Entry(win)
 req_entry.bind("<Return>",req)
 req_entry.pack()
 
-req_brt = tkinter.Button(win, text="검색", overrelief="solid", command=req, repeatdelay=1000, repeatinterval=100)
-req_brt.pack()
+req_btn = tkinter.Button(win, text="검색", overrelief="solid", command=req, repeatdelay=1000, repeatinterval=100)
+req_btn.pack()
 
 res_label_1 = tkinter.Label(text='')
 res_label_1.pack()
 
+res_btn_1 = tkinter.Button(win, text="자세히",relief="flat", overrelief="solid", command='', repeatdelay=1000, repeatinterval=100, state="disabled", disabledforeground="#f0f0f0")
+res_btn_1.pack()
+
 res_label_2 = tkinter.Label(text='')
 res_label_2.pack()
+
+res_btn_2 = tkinter.Button(win, text="자세히",relief="flat", overrelief="solid", command='', repeatdelay=1000, repeatinterval=100, state="disabled", disabledforeground="#f0f0f0")
+res_btn_2.pack()
 
 res_label_3 = tkinter.Label(text='')
 res_label_3.pack()
 
+res_btn_3 = tkinter.Button(win, text="자세히",relief="flat", overrelief="solid", command='', repeatdelay=1000, repeatinterval=100, state="disabled", disabledforeground="#f0f0f0")
+res_btn_3.pack()
+
 res_label_4 = tkinter.Label(text='')
 res_label_4.pack()
 
+res_btn_4 = tkinter.Button(win, text="자세히",relief="flat", overrelief="solid", command='', repeatdelay=1000, repeatinterval=100, state="disabled", disabledforeground="#f0f0f0")
+res_btn_4.pack()
+
 res_label_5 = tkinter.Label(text='')
 res_label_5.pack()
+
+res_btn_5 = tkinter.Button(win, text="자세히",relief="flat", overrelief="solid", command='', repeatdelay=1000, repeatinterval=100, state="disabled", disabledforeground="#f0f0f0")
+res_btn_5.pack()
+
 
 win.mainloop()
 

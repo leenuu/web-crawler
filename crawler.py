@@ -1,100 +1,86 @@
-from bs4 import BeautifulSoup
-import tkinter 
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
+import tkinter 
 import os
 import requests
 import webbrowser
 
+def go_url(_url):
+    # print('hello')
+    driver = webdriver.Chrome(ChromeDriverManager().install())
+    driver.implicitly_wait(3)
+    driver.get(_url)
+
 def req_btn():
+    ua = UserAgent()
+    header = {'User-Agent':str(ua.chrome)}
     src = str(req_entry.get())
-    options = webdriver.ChromeOptions()
-    options.add_argument('headless')
-    options.add_argument('window-size=1920x1080')
-    options.add_argument("disable-gpu")
-    options.add_argument("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
+    # options = webdriver.ChromeOptions()
+    # options.add_argument('headless')
+    # options.add_argument('window-size=1920x1080')
+    # # options.add_argument("disable-gpu")
+    # options.add_argument("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
 
-    driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
-    driver.implicitly_wait(3)
-    driver.get('https://google.com')
-    driver.find_element_by_name('q').send_keys(src)
-    driver.find_element_by_name('btnK').click()
+    # driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
+    # driver.implicitly_wait(3)
+    # driver.get('https://google.com')
+    # driver.find_element_by_name('q').send_keys(src)
+    # driver.find_element_by_name('btnK').click()
 
-    # url = 'https://www.google.com/search?q=' + src
+    url = 'https://www.google.com/search?q=' + src
 
-    # req_html = requests.get(url)
-    html = driver.page_source
+    req_html = requests.get(url, headers=header)
+    html = req_html.text
     soup = BeautifulSoup(html, 'html.parser')
+    _html = soup.prettify()
     data_url = list()
     data = list()
+    # href_url = list()
     # data = soup.find_all('a') and soup.find_all('h3')
 
     # print(data)
-    for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3'):
+    for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3', class_ = 'LC20lb DKV0Md'):
         if link.get_text().find(src) == 0:
             data_url.append(link.parent.get('href'))
             data.append(link.get_text())
 
-    data_len = len(data)
-
-    if data_len > 5 :
-        res_label_reset()
-        for i in range(0,5):
-            res_label[i].config(text=data[i])
-            res_btn[i].config(state="normal")
-    elif data_len <= 5:
-        res_label_reset()
-        for i in range(0,data_len):
-            res_label[i].config(text=data[i])
-            res_btn[i].config(state="normal")
-
-def req(event):
-    src = str(req_entry.get())
-    options = webdriver.ChromeOptions()
-    options.add_argument('headless')
-    options.add_argument('window-size=1920x1080')
-    options.add_argument("disable-gpu")
-    options.add_argument("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
-
-    driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
-    driver.implicitly_wait(3)
-    driver.get('https://google.com')
-    driver.find_element_by_name('q').send_keys(src)
-    driver.find_element_by_name('btnK').click()
-
-    # url = 'https://www.google.com/search?q=' + src
-
-    # req_html = requests.get(url)
-    html = driver.page_source
-    soup = BeautifulSoup(html, 'html.parser')
-    data_url = list()
-    data = list()
-    # data = soup.find_all('a') and soup.find_all('h3')
-
-    # print(data)
-    for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3'):
-        if link.get_text().find(src) == 0:
-            data_url.append(link.parent.get('href'))
-            data.append(link.get_text())
+    with open('data.txt', 'w', encoding='utf-8') as make_file:
+        make_file.write(_html)
+    
 
     data_len = len(data)
 
+    
     if data_len > 5 :
         res_label_reset()
-        for i in range(0,5):
+        for i in range(0,5):  
             res_label[i].config(text=data[i])
-            res_btn[i].config(state="normal")
+            res_btn[i].config(state="normal",)
+            _url = data_url[i]
+            # res_btn[i].config(command = lambda: go_url(data_url[i]))
+        res_btn[0].config(command = lambda: go_url(data_url[0]))
+        res_btn[1].config(command = lambda: go_url(data_url[1]))
+        res_btn[2].config(command = lambda: go_url(data_url[2]))
+        res_btn[3].config(command = lambda: go_url(data_url[3]))
+        res_btn[4].config(command = lambda: go_url(data_url[4]))
+
     elif data_len <= 5:
         res_label_reset()
         for i in range(0,data_len):
+            _url = data_url[i]
             res_label[i].config(text=data[i])
             res_btn[i].config(state="normal")
-
-
+            # res_btn[i].config(command = lambda: go_url(data_url[i]))
+        res_btn[0].config(command = lambda: go_url(data_url[0]))
+        res_btn[1].config(command = lambda: go_url(data_url[1]))
+        res_btn[2].config(command = lambda: go_url(data_url[2]))
+        res_btn[3].config(command = lambda: go_url(data_url[3]))
+        res_btn[4].config(command = lambda: go_url(data_url[4]))
         
-    # # driver.close()
-    # with open('req.txt', 'w', encoding='utf-8') as make_file:
-    #     make_file.write(data)
+
+
 
 def res_label_reset():
     for i in range(0,5):
@@ -104,8 +90,12 @@ def res_label_reset():
 # btn_1_state = "normal"
 # state_dis = "disabled"
 
+
+
+
 res_label = list()
 res_btn = list()
+
 
 win = tkinter.Tk()
 win.title("web crawler")
@@ -113,7 +103,6 @@ win.geometry("640x400")
 win.resizable(False,False)
 
 req_entry = tkinter.Entry(win)
-req_entry.bind("<Return>",req)
 req_entry.pack()
 
 req_btn = tkinter.Button(win, text="검색", overrelief="solid", command=req_btn, repeatdelay=1000, repeatinterval=100)
@@ -122,12 +111,71 @@ req_btn.pack()
 for i in range(0, 5):
     res_label.append(tkinter.Label(text=''))
     res_label[i].pack()
-    res_btn.append(tkinter.Button(win, text="자세히",relief="flat", overrelief="solid", command='webbrowser.open()', repeatdelay=1000, repeatinterval=100, state="disabled", disabledforeground="#f0f0f0"))
+    res_btn.append(tkinter.Button(win, text="자세히",relief="flat", overrelief="solid", repeatdelay=1000, repeatinterval=100, state="disabled", disabledforeground="#f0f0f0"))
     res_btn[i].pack()
 
 win.mainloop()
 
+# def req(event):
+#     ua = UserAgent()
+#     header = {'User-Agent':str(ua.chrome)}
+#     src = str(req_entry.get())
+#     # options = webdriver.ChromeOptions()
+#     # options.add_argument('headless')
+#     # options.add_argument('window-size=1920x1080')
+#     # # options.add_argument("disable-gpu")
+#     # options.add_argument("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
 
+#     # driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
+#     # driver.implicitly_wait(3)
+#     # driver.get('https://google.com')
+#     # driver.find_element_by_name('q').send_keys(src)
+#     # driver.find_element_by_name('btnK').click()
+
+#     url = 'https://www.google.com/search?q=' + src
+
+#     req_html = requests.get(url, headers=header)
+#     html = req_html.text
+#     soup = BeautifulSoup(html, 'html.parser')
+#     data_url = list()
+#     data = list()
+#     href_url = list()
+#     # data = soup.find_all('a') and soup.find_all('h3')
+
+#     # print(data)
+#     for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3'):
+#         if link.get_text().find(src) == 0:
+#             data_url.append(link.parent.get('href'))
+#             data.append(link.get_text())
+
+#     data_len = len(data)
+
+#     if data_len > 5 :
+#         res_label_reset()
+#         # for i in range(0,5):
+#         #     href_url.append(go_url(data_url[i]))
+#         #     res_btn[i].bind("<Button-1>", href_url[i])
+
+#         for i in range(0,5):
+#             res_label[i].config(text=data[i])
+#             res_btn[i].config(state="normal")
+#     elif data_len <= 5:
+#         res_label_reset()
+#         # for i in range(0,data_len):
+#         #     href_url.append(go_url(data_url[i]))
+#         #     res_btn[i].bind("<Button-1>", href_url[i])
+
+
+#         for i in range(0,data_len):
+#             res_label[i].config(text=data[i])
+#             res_btn[i].config(state="normal")
+            
+
+
+        
+#     # # driver.close()
+#     # with open('req.txt', 'w', encoding='utf-8') as make_file:
+#     #     make_file.write(data)
 
 
 
@@ -225,7 +273,8 @@ win.mainloop()
 # options = webdriver.ChromeOptions()
 # options.add_argument('headless')
 # options.add_argument('window-size=1920x1080')
-# options.add_argument("disable-gpu")
+# # options.add_argument("disable-gpu")
+# options.add_argument("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
 
 # driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
 # driver.implicitly_wait(3)
@@ -251,14 +300,14 @@ win.mainloop()
 
 # # print(soup.find_all("div", class_="r"))
 
-# # for link in soup.find_all('a') and soup.find_all('h3'):
-# #     # print(link.get_text())
-# #     if link.get_text().find(src) == 0:
-# #         data_url.append(link.parent.get('href'))
-# #         data.append(link.get_text()) 
+# for link in soup.find_all(class_ = 'r') and soup.find_all('a') and soup.find_all('h3'):
+#     # print(link.get_text())
+#     if link.get_text().find(src) == 0:
+#         data_url.append(link.parent.get('href'))
+#         # data.append(link.get_text()) 
         
 
-# # print(data_url)
+# print(data_url)
 # driver.close()
 # with open('star.txt', 'w', encoding='utf-8') as make_file:
 #      make_file.write(html_data)

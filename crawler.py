@@ -57,7 +57,7 @@ def req_btn():
         res_label_reset()
         for i in range(0,5):  
             res_label[i].config(text=data[i])
-            res_btn[i].config(state="normal",)
+            res_btn[i].config(state="normal")
             _url = data_url[i]
             # res_btn[i].config(command = lambda: go_url(data_url[i]))
         res_btn[0].config(command = lambda: go_url(data_url[0]))
@@ -106,12 +106,13 @@ req_entry = tkinter.Entry(win)
 req_entry.pack()
 
 req_btn = tkinter.Button(win, text="검색", overrelief="solid", command=req_btn, repeatdelay=1000, repeatinterval=100)
-req_btn.pack()
+req_btn.pack(side = "right", ipadx=5, ipady=5)
+
 
 for i in range(0, 5):
     res_label.append(tkinter.Label(text=''))
     res_label[i].pack()
-    res_btn.append(tkinter.Button(win, text="자세히",relief="flat", overrelief="solid", repeatdelay=1000, repeatinterval=100, state="disabled", disabledforeground="#f0f0f0"))
+    res_btn.append(tkinter.Button(win, text="바로가기",relief="flat", overrelief="solid", repeatdelay=1000, repeatinterval=100, state="disabled", disabledforeground="#f0f0f0"))
     res_btn[i].pack()
 
 win.mainloop()

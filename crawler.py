@@ -2,10 +2,19 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
-import tkinter 
+from multiprocessing import Pool
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.uix.button import Button
+from kivy.uix.label import Label
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.textinput import TextInput
+# import tkinter 
 import os
 import requests
 import webbrowser
+
 
 def go_url(_url):
     # print('hello')
@@ -13,111 +22,138 @@ def go_url(_url):
     driver.implicitly_wait(3)
     driver.get(_url)
 
-def req_btn():
+def get_links(src):
     ua = UserAgent()
     header = {'User-Agent':str(ua.chrome)}
-    src = str(req_entry.get())
-    # options = webdriver.ChromeOptions()
-    # options.add_argument('headless')
-    # options.add_argument('window-size=1920x1080')
-    # # options.add_argument("disable-gpu")
-    # options.add_argument("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
-
-    # driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
-    # driver.implicitly_wait(3)
-    # driver.get('https://google.com')
-    # driver.find_element_by_name('q').send_keys(src)
-    # driver.find_element_by_name('btnK').click()
-
     url = 'https://www.google.com/search?q=' + src
 
     req_html = requests.get(url, headers=header)
     html = req_html.text
     soup = BeautifulSoup(html, 'html.parser')
-    _html = soup.prettify()
+    # _html = soup.prettify()
     data_url = list()
     data = list()
-    # href_url = list()
-    # data = soup.find_all('a') and soup.find_all('h3')
 
-    # print(data)
-    for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3', class_ = 'LC20lb DKV0Md'):
-        if link.get_text().find(src) == 0:
-            data_url.append(link.parent.get('href'))
-            data.append(link.get_text())
+    for _url in soup.find_all('div', id="food") and soup.find_all('span', id='xjs') and soup.find_all('table', class_='AaVjTc') and soup.find_all('tbody') and soup.find('tr') and soup.find_all('td') and soup.find_all('a'):
+        data_url.append(_url)
+    print(data_url)
 
-    with open('data.txt', 'w', encoding='utf-8') as make_file:
-        make_file.write(_html)
+
+
+def req_btn():
+    src = str()
+    get_links(src)
+
+
+    # for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3', class_ = 'LC20lb DKV0Md'):
+    #     if link.get_text().find(src) == 0:
+    #         data_url.append(link.parent.get('href'))
+    #         data.append(link.get_text())
+
+    # with open('data.txt', 'w', encoding='utf-8') as make_file:
+    #     make_file.write(_html)
     
+    # data_len = len(data)
 
-    data_len = len(data)
+src = '파이썬'
 
-    
-    if data_len > 5 :
-        res_label_reset()
-        for i in range(0,5):  
-            res_label[i].config(text=data[i])
-            res_btn[i].config(state="normal")
-            _url = data_url[i]
-            # res_btn[i].config(command = lambda: go_url(data_url[i]))
-        res_btn[0].config(command = lambda: go_url(data_url[0]))
-        res_btn[1].config(command = lambda: go_url(data_url[1]))
-        res_btn[2].config(command = lambda: go_url(data_url[2]))
-        res_btn[3].config(command = lambda: go_url(data_url[3]))
-        res_btn[4].config(command = lambda: go_url(data_url[4]))
+ua = UserAgent()
+header = {'User-Agent':str(ua.chrome)}
+url = 'https://www.google.com/search?q=' + src
 
-    elif data_len <= 5:
-        res_label_reset()
-        for i in range(0,data_len):
-            _url = data_url[i]
-            res_label[i].config(text=data[i])
-            res_btn[i].config(state="normal")
-            # res_btn[i].config(command = lambda: go_url(data_url[i]))
-        res_btn[0].config(command = lambda: go_url(data_url[0]))
-        res_btn[1].config(command = lambda: go_url(data_url[1]))
-        res_btn[2].config(command = lambda: go_url(data_url[2]))
-        res_btn[3].config(command = lambda: go_url(data_url[3]))
-        res_btn[4].config(command = lambda: go_url(data_url[4]))
+req_html = requests.get(url, headers=header)
+html = req_html.text
+soup = BeautifulSoup(html, 'html.parser')
+# _html = soup.prettify()
+data_url = list()
+# data = list()
+
+for _url in soup.find('div', id="foot", role="navigation") and soup.find('table', class_='AaVjTc') and soup.find_all('td') and soup.find_all('a', class_="fl") and soup.find_all('span', class_="SJajHc NVbCr"):
+    # print(_url)
+    data_url.append('https://www.google.com'+_url.parent.get('href'))
+
+print(data_url)
+
+
+
+# class TestApp(App):
+
+#     def build(self):
+        
+#         root_widget = BoxLayout(orientation='vertical')
+
+#         layout_grid = GridLayout(cols=3, size_hint_y = 6)
+
+#         input_src = TextInput()
+
+#         layout_grid.add_widget(input_src)
+#         root_widget.add_widget(layout_grid)
         
 
+#         return root_widget
+
+# TestApp().run()
+
+    
+# def print_button_text(instance):
+#     print(instance.text)
+#     output_label.text += instance.text
+
+# def clear_button_text(instance):
+#     output_label.text = ''
+
+# def evaluate_result(instance):
+#     try:
+#         output_label.text = str(eval(output_label.text))
+#     except SyntaxError:
+#         output_label.text = 'Python syntax error!'
 
 
-def res_label_reset():
-    for i in range(0,5):
-        res_label[i].config(text='')
-        res_btn[i].config(state="disabled")
+# root_widget = BoxLayout(orientation='vertical')
 
-# btn_1_state = "normal"
-# state_dis = "disabled"
+# output_label = Label(size_hint_y=1)
 
+# button_symbols = ('1', '2', '3', '+',
+#                   '4', '5', '6', '-',
+#                   '7', '8', '9', '.',
+#                   '0', '*', '/', '=')
 
+# button_grid = GridLayout(cols=4, size_hint_y=5)
 
+# for symbols in button_symbols:
+#     button_grid.add_widget(Button(text=symbols))
 
-res_label = list()
-res_btn = list()
+# clear_button = Button(text='clear', size_hint_y=None, height=100)
 
-
-win = tkinter.Tk()
-win.title("web crawler")
-win.geometry("640x400")
-win.resizable(False,False)
-
-req_entry = tkinter.Entry(win)
-req_entry.pack()
-
-req_btn = tkinter.Button(win, text="검색", overrelief="solid", command=req_btn, repeatdelay=1000, repeatinterval=100)
-req_btn.pack(side = "right", ipadx=5, ipady=5)
+# root_widget.add_widget(output_label)
+# root_widget.add_widget(button_grid)
+# root_widget.add_widget(clear_button)
 
 
-for i in range(0, 5):
-    res_label.append(tkinter.Label(text=''))
-    res_label[i].pack()
-    res_btn.append(tkinter.Button(win, text="바로가기",relief="flat", overrelief="solid", repeatdelay=1000, repeatinterval=100, state="disabled", disabledforeground="#f0f0f0"))
-    res_btn[i].pack()
+# for button in button_grid.children[1:]:
+#     button.bind(on_press=print_button_text)
 
-win.mainloop()
+# clear_button.bind(on_press=clear_button_text)
 
-# def req(event):
+
+# button_grid.children[0].bind(on_press=evaluate_result)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+# def req():
 #     ua = UserAgent()
 #     header = {'User-Agent':str(ua.chrome)}
 #     src = str(req_entry.get())

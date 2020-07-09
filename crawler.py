@@ -22,7 +22,7 @@ def go_url(_url):
     driver.implicitly_wait(3)
     driver.get(_url)
 
-def get_links(src):
+def get_links():
     ua = UserAgent()
     header = {'User-Agent':str(ua.chrome)}
     url = 'https://www.google.com/search?q=' + src
@@ -32,49 +32,110 @@ def get_links(src):
     soup = BeautifulSoup(html, 'html.parser')
     # _html = soup.prettify()
     data_url = list()
+    data_url.append('/search?q=' + src)
+    for _url in soup.find('div', id="foot", role="navigation") and soup.find('table', class_='AaVjTc') and soup.find_all('td') and soup.find_all('a', class_="fl") and soup.find_all('span', class_="SJajHc NVbCr"):
+        data_url.append(_url.parent.get('href'))
+
+    return data_url
+
+def _src(link):
+    ua = UserAgent()
+    header = {'User-Agent':str(ua.chrome)}
+    _url = 'https://www.google.com' + link
+    req = requests.get(_url, headers=header)
+    html = req.text
+    soup = BeautifulSoup(html, 'html.parser')
     data = list()
-
-    for _url in soup.find_all('div', id="food") and soup.find_all('span', id='xjs') and soup.find_all('table', class_='AaVjTc') and soup.find_all('tbody') and soup.find('tr') and soup.find_all('td') and soup.find_all('a'):
-        data_url.append(_url)
-    print(data_url)
-
-
-
-def req_btn():
-    src = str()
-    get_links(src)
-
-
-    # for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3', class_ = 'LC20lb DKV0Md'):
-    #     if link.get_text().find(src) == 0:
-    #         data_url.append(link.parent.get('href'))
-    #         data.append(link.get_text())
-
-    # with open('data.txt', 'w', encoding='utf-8') as make_file:
-    #     make_file.write(_html)
+    for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3'):
+        if link.get_text().find(src) == 0:
+            # data_url.append(link.parent.get('href'))
+            data.append(link.get_text())
     
-    # data_len = len(data)
+    return data
+    # print(data)
+
+
+
 
 src = '파이썬'
+# print(get_links())
+_urls = get_links()
 
-ua = UserAgent()
-header = {'User-Agent':str(ua.chrome)}
-url = 'https://www.google.com/search?q=' + src
+_data = list()
 
-req_html = requests.get(url, headers=header)
-html = req_html.text
-soup = BeautifulSoup(html, 'html.parser')
-# _html = soup.prettify()
-data_url = list()
-# data = list()
-
-for _url in soup.find('div', id="foot", role="navigation") and soup.find('table', class_='AaVjTc') and soup.find_all('td') and soup.find_all('a', class_="fl") and soup.find_all('span', class_="SJajHc NVbCr"):
-    # print(_url)
-    data_url.append('https://www.google.com'+_url.parent.get('href'))
-
-print(data_url)
+if __name__ == '__main__':
+    pool = Pool(processes=4)
+    _data = pool.map(_src, _urls)
+    print(_data)
+    
 
 
+
+# for link in _urls:
+#     _src(link)
+
+
+
+
+
+# ua = UserAgent()
+# header = {'User-Agent':str(ua.chrome)}
+# url = 'https://www.google.com/search?q=' + src
+
+# req_html = requests.get(url, headers=header)
+# html = req_html.text
+# soup = BeautifulSoup(html, 'html.parser')
+# # _html = soup.prettify()
+# data_url = list()
+# # data = list()
+# data = ''
+
+# for _url in soup.find('div', id="foot", role="navigation") and soup.find('table', class_='AaVjTc') and soup.find_all('td') and soup.find_all('a', class_="fl") and soup.find_all('span', class_="SJajHc NVbCr"):
+#     # print(_url)
+#     data_url.append('https://www.google.com'+_url.parent.get('href'))
+
+
+
+# print(data_url)
+
+
+
+# if __name__=='__main__':
+#     pool = Pool(processes=4)
+#     pool.map(_src, get_links())
+
+
+
+# for _url in data_url:
+#     data = data + _url + '\n'
+
+# with open('data.txt', 'w', encoding='utf-8') as make_file:
+#     make_file.write(data)
+
+
+
+
+
+
+
+
+
+
+
+
+# def req_btn():
+#     get_links(src)
+
+
+#     # for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3', class_ = 'LC20lb DKV0Md'):
+#     #     if link.get_text().find(src) == 0:
+#     #         data_url.append(link.parent.get('href'))
+#     #         data.append(link.get_text())
+
+#     with open('data.txt', 'w', encoding='utf-8') as make_file:
+#         make_file.write(_html)
+    
+#     # data_len = len(data)
 
 # class TestApp(App):
 

@@ -14,6 +14,8 @@ from kivy.uix.textinput import TextInput
 import os
 import requests
 import webbrowser
+import time
+import random
 
 
 def go_url(_url):
@@ -26,6 +28,9 @@ def get_links():
     ua = UserAgent()
     header = {'User-Agent':str(ua.chrome)}
     url = 'https://www.google.com/search?q=' + src
+
+    rand_value = random.uniform(0,40)
+    time.sleep(rand_value)
 
     req_html = requests.get(url, headers=header)
     html = req_html.text
@@ -42,6 +47,8 @@ def _src(link):
     ua = UserAgent()
     header = {'User-Agent':str(ua.chrome)}
     _url = 'https://www.google.com' + link
+    rand_value = random.uniform(0,30)
+    time.sleep(rand_value)
     req = requests.get(_url, headers=header)
     html = req.text
     soup = BeautifulSoup(html, 'html.parser')
@@ -65,7 +72,7 @@ _data = list()
 
 if __name__ == '__main__':
     pool = Pool(processes=4)
-    _data = pool.map(_src, _urls)
+    _data += pool.map(_src, _urls)
     print(_data)
     
 

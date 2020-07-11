@@ -3,14 +3,14 @@ from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from multiprocessing import Pool
-from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.uix.button import Button
-from kivy.uix.label import Label
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.textinput import TextInput
-# import tkinter 
+# from kivy.app import App
+# from kivy.uix.widget import Widget
+# from kivy.uix.button import Button
+# from kivy.uix.label import Label
+# from kivy.uix.boxlayout import BoxLayout
+# from kivy.uix.gridlayout import GridLayout
+# from kivy.uix.textinput import TextInput
+import tkinter 
 import os
 import requests
 import webbrowser
@@ -18,13 +18,31 @@ import time
 import random
 
 
-def go_url(_url):
-    # print('hello')
-    driver = webdriver.Chrome(ChromeDriverManager().install())
-    driver.implicitly_wait(3)
-    driver.get(_url)
+# def _cls():
+#     print('cls..')
+#     for i in range(0,_url_len):
+#         res_box.delete(i)
 
-def get_links():
+
+def check():
+    ua = UserAgent()
+    header = {'User-Agent':str(ua.chrome)}
+    url = 'https://www.google.com/search?q=py'
+    req_html = requests.get(url, headers=header)
+    html = req_html.text
+    print(html)
+
+
+# def go_url(_url):
+#     # print('hello')
+#     driver = webdriver.Chrome(ChromeDriverManager().install())
+#     driver.implicitly_wait(3)
+#     driver.get(_url)
+
+
+
+def get_links(src):
+    print('get links..')
     ua = UserAgent()
     header = {'User-Agent':str(ua.chrome)}
     url = 'https://www.google.com/search?q=' + src
@@ -41,9 +59,16 @@ def get_links():
     for _url in soup.find('div', id="foot", role="navigation") and soup.find('table', class_='AaVjTc') and soup.find_all('td') and soup.find_all('a', class_="fl") and soup.find_all('span', class_="SJajHc NVbCr"):
         data_url.append(_url.parent.get('href'))
 
+    # num = 0
+    # for _data in data_url:
+    #     num += 1
+    #     res_box.insert(num,_data)
+    print('complete get links..')
     return data_url
 
 def _src(link):
+    print('get src..')
+    _url_len = 0
     ua = UserAgent()
     header = {'User-Agent':str(ua.chrome)}
     _url = 'https://www.google.com' + link
@@ -56,109 +81,95 @@ def _src(link):
     for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3'):
         if link.get_text().find(src) == 0:
             # data_url.append(link.parent.get('href'))
+            _url_len += 1
             data.append(link.get_text())
-    
+    print('complete get src..')
     return data
     # print(data)
 
+def result(src):
+    # global src 
+    # src = req_entry.get()
+    # _cls()
+    _urls = get_links(src)
+    _data = list()
+    sum_data = list()
+    if __name__ == '__main__':
+        s_t = time.time()
+        pool = Pool(processes=2)
+        _data += pool.map(_src, _urls[:len(_urls)-1])
+        print('sum result..')
+        for i in range(0,len(_data)):
+            for j in range(0,len(_data[i])):
+                sum_data.append(_data[i][j])
+            
+        e_t = time.time()
+        print('result..')
+        print(e_t - s_t)
+        print(len(_data))
+        print(sum_data)
+        num = 0
+        # for list_data in sum_data:
+        #     num += 1
+        #     res_box.insert(num,list_data)
+
+# check()
+_url_len = 0
+src = "파이썬"
+# for i in get_links(src):
+#     print(_src(i))
+result(src)
+# win=tkinter.Tk()
+# win.title("검색")
+# win.geometry("640x480+100+100")
+# win.resizable(False, False)
+
+# req_entry = tkinter.Entry(win)
+# req_entry.pack()
+
+# req_btn = tkinter.Button(win, text="검색", overrelief="solid", command=lambda:result(req_entry.get()), repeatdelay=1000, repeatinterval=100)
+# req_btn.pack()
+
+# frm = tkinter.Frame(win)
+# sr_y_bar = tkinter.Scrollbar(frm)
+# sr_y_bar.pack(side="right", fill="y")
+# sr_x_bar = tkinter.Scrollbar(frm, orient=tkinter.HORIZONTAL)
+# sr_x_bar.pack(side="bottom", fill="x")
+
+# res_box = tkinter.Listbox(frm, width=40, selectmode='extended', height=0, yscrollcommand=sr_y_bar.set, xscrollcommand=sr_x_bar)
+# res_box.pack(side="left")
+
+# sr_y_bar["command"]=res_box.yview
+# sr_x_bar["command"]=res_box.xview
+# frm.pack()
+
+# win.mainloop()
 
 
-
-src = '파이썬'
 # print(get_links())
-_urls = get_links()
+# _urls = get_links()
 
-_data = list()
+# _data = list()
 
-if __name__ == '__main__':
-    pool = Pool(processes=4)
-    _data += pool.map(_src, _urls)
-    print(_data)
+# if __name__ == '__main__':
+#     s_t = time.time()
+#     pool = Pool(processes=4)
+#     _data += pool.map(_src, _urls[:len(_urls)-1])
+#     e_t = time.time()
+#     print(e_t - s_t)
+#     print(len(_data))
+#     print(_data)
     
-
-
 
 # for link in _urls:
 #     _src(link)
 
 
-
-
-
-# ua = UserAgent()
-# header = {'User-Agent':str(ua.chrome)}
-# url = 'https://www.google.com/search?q=' + src
-
-# req_html = requests.get(url, headers=header)
-# html = req_html.text
-# soup = BeautifulSoup(html, 'html.parser')
-# # _html = soup.prettify()
-# data_url = list()
-# # data = list()
-# data = ''
-
-# for _url in soup.find('div', id="foot", role="navigation") and soup.find('table', class_='AaVjTc') and soup.find_all('td') and soup.find_all('a', class_="fl") and soup.find_all('span', class_="SJajHc NVbCr"):
-#     # print(_url)
-#     data_url.append('https://www.google.com'+_url.parent.get('href'))
-
-
-
-# print(data_url)
-
-
-
-# if __name__=='__main__':
-#     pool = Pool(processes=4)
-#     pool.map(_src, get_links())
-
-
-
-# for _url in data_url:
-#     data = data + _url + '\n'
-
-# with open('data.txt', 'w', encoding='utf-8') as make_file:
-#     make_file.write(data)
-
-
-
-
-
-
-
-
-
-
-
-
-# def req_btn():
-#     get_links(src)
-
-
-#     # for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3', class_ = 'LC20lb DKV0Md'):
-#     #     if link.get_text().find(src) == 0:
-#     #         data_url.append(link.parent.get('href'))
-#     #         data.append(link.get_text())
-
-#     with open('data.txt', 'w', encoding='utf-8') as make_file:
-#         make_file.write(_html)
-    
-#     # data_len = len(data)
-
 # class TestApp(App):
+#     pass
 
-#     def build(self):
-        
-#         root_widget = BoxLayout(orientation='vertical')
-
-#         layout_grid = GridLayout(cols=3, size_hint_y = 6)
-
-#         input_src = TextInput()
-
-#         layout_grid.add_widget(input_src)
-#         root_widget.add_widget(layout_grid)
-        
-
-#         return root_widget
+# class Upper_bar(BoxLayout):
+#     pass
 
 # TestApp().run()
 
@@ -210,14 +221,57 @@ if __name__ == '__main__':
 
 
 
+# ua = UserAgent()
+# header = {'User-Agent':str(ua.chrome)}
+# url = 'https://www.google.com/search?q=' + src
+
+# req_html = requests.get(url, headers=header)
+# html = req_html.text
+# soup = BeautifulSoup(html, 'html.parser')
+# # _html = soup.prettify()
+# data_url = list()
+# # data = list()
+# data = ''
+
+# for _url in soup.find('div', id="foot", role="navigation") and soup.find('table', class_='AaVjTc') and soup.find_all('td') and soup.find_all('a', class_="fl") and soup.find_all('span', class_="SJajHc NVbCr"):
+#     # print(_url)
+#     data_url.append('https://www.google.com'+_url.parent.get('href'))
+
+
+
+# print(data_url)
+
+
+
+# if __name__=='__main__':
+#     pool = Pool(processes=4)
+#     pool.map(_src, get_links())
+
+
+
+# for _url in data_url:
+#     data = data + _url + '\n'
+
+# with open('data.txt', 'w', encoding='utf-8') as make_file:
+#     make_file.write(data)
 
 
 
 
 
+# def req_btn():
+#     get_links(src)
 
 
+#     # for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3', class_ = 'LC20lb DKV0Md'):
+#     #     if link.get_text().find(src) == 0:
+#     #         data_url.append(link.parent.get('href'))
+#     #         data.append(link.get_text())
 
+#     with open('data.txt', 'w', encoding='utf-8') as make_file:
+#         make_file.write(_html)
+    
+#     # data_len = len(data)
 
 
     
@@ -313,11 +367,6 @@ if __name__ == '__main__':
 
 # # res_btn_5 = tkinter.Button(win, text="자세히",relief="flat", overrelief="solid", command='', repeatdelay=1000, repeatinterval=100, state="disabled", disabledforeground="#f0f0f0")
 # # res_btn_5.pack()
-
-
-
-
-
 
 
 # for i in range(0,4):

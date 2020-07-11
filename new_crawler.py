@@ -47,7 +47,7 @@ def get_rsc(link):
     
     rsc_data = list()
     for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3'):
-        if link.get_text().find(src) == 0:
+        if link.get_text().find(_src) == 0:
             # data_url.append(link.parent.get('href'))
             rsc_data.append(link.get_text())
 
@@ -56,13 +56,13 @@ def get_rsc(link):
 
 def res(source):
     if __name__ == '__main__':
-        global src
-        src = source 
-        links = get_link(src)
+        global _src
+        _src = source 
+        links = get_link(_src)
 
         data = list()
         sum_data = list()
-        
+
         s_t = time.time()
         pool = Pool(processes=3)
         data += pool.map(get_rsc, links[:len(links)-1])

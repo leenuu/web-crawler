@@ -3,7 +3,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from multiprocessing import Pool
-import tkinter 
 import os
 import requests
 import webbrowser
@@ -31,6 +30,7 @@ def get_link(src):
     return url_data
 
 def get_rsc(link):
+    
     print('start get rsc...')
 
     ua = UserAgent()
@@ -44,11 +44,11 @@ def get_rsc(link):
     req = requests.get(_url, headers=header)
     html = req.text
     soup = BeautifulSoup(html, 'html.parser')
-    
+
     rsc_data = list()
     for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3'):
         if link.get_text().find(_src) == 0:
-            # data_url.append(link.parent.get('href'))
+            # rsc_data.append(link.parent.get('href'))
             rsc_data.append(link.get_text())
 
     print('complete get src..')
@@ -56,8 +56,8 @@ def get_rsc(link):
 
 def res(source):
     if __name__ == '__main__':
-        global _src
         _src = source 
+        del_st = '관련 검색: ' + _src
         links = get_link(_src)
 
         data = list()
@@ -65,16 +65,20 @@ def res(source):
 
         s_t = time.time()
         pool = Pool(processes=3)
-        data += pool.map(get_rsc, links[:len(links)-1])
+        data += pool.map(get_rsc, links[:len(links)])
         print('sum result..')
         for i in range(0,len(data)):
             for j in range(0,len(data[i])):
-                sum_data.append(data[i][j])
+                if data[i][j] == del_st: 
+                    pass
+                else:    
+                    sum_data.append(data[i][j])
+
         e_t = time.time()
         print('result..')
         print(f"{e_t - s_t} s...")
         print(len(data))
         print(sum_data)
     
-
+_src = ''
 res('파이썬')

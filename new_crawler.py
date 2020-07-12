@@ -54,9 +54,9 @@ def get_rsc(link):
     print('complete get src..')
     return rsc_data
 
-def res(source):
+def res():
     if __name__ == '__main__':
-        _src = source 
+        _src = input("Please enter here to search: ") 
         del_st = '관련 검색: ' + _src
         links = get_link(_src)
 
@@ -81,4 +81,5 @@ def res(source):
         print(sum_data)
     
 _src = ''
-res('파이썬')
+
+res()

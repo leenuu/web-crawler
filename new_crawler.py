@@ -3,15 +3,23 @@ from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from multiprocessing import Pool
+from xlsxwriter.workbook import Workbook
+import win32com.client as win32
+import glob
 import os
 import requests
 import webbrowser
 import time
 import random
+import csv
+
 
 _src = ''
-de_time = 40
+max_de_time = 30
+min_de_time = 0
 processes_num = 3
+naver_page = 6
+daum_page = 3
 
 def ch():
     ua = UserAgent()
@@ -51,7 +59,7 @@ def get_rsc_google(link):
     header = {'User-Agent':str(ua.chrome)}
     _url = 'https://www.google.com' + link
 
-    rand_value = random.uniform(0,de_time)
+    rand_value = random.uniform(min_de_time,max_de_time)
     time.sleep(rand_value)
 
     print('requests...')
@@ -77,7 +85,7 @@ def get_rsc_google(link):
 def get_link_naver(src):
     url_naver_data = list()
     print('start get links...')
-    for num in range(0,10):
+    for num in range(0,naver_page):
         page = 1 + num * 10 
         url_naver_data.append(f'https://search.naver.com/search.naver?sm=tab_hty.top&where=post&query={src}&where=post&start={page}')
     print('complete get links..')
@@ -89,7 +97,7 @@ def get_rsc_naver(link):
     header = {'User-Agent':str(ua.chrome)}
     _url = link
 
-    rand_value = random.uniform(0,de_time)
+    rand_value = random.uniform(min_de_time,max_de_time)
     time.sleep(rand_value)
 
     print('requests...')
@@ -117,7 +125,7 @@ def get_rsc_naver(link):
 def get_link_daum(src):
     url_data = list()
     print('start get links...')
-    for page in range(1,11):
+    for page in range(1,daum_page + 1):
         url_data.append(f'https://search.daum.net/search?w=blog&DA=PGD&enc=utf8&q={src}&page={page}')
     print('complete get links..')
     return url_data
@@ -128,7 +136,7 @@ def get_rsc_daum(link):
     header = {'User-Agent':str(ua.chrome)}
     _url = link
 
-    rand_value = random.uniform(0,de_time)
+    rand_value = random.uniform(min_de_time,max_de_time)
     time.sleep(rand_value)
 
     print('requests...')
@@ -156,62 +164,207 @@ def get_rsc_daum(link):
 def res():
     if __name__ == '__main__':
         global _src
-        _src = input("Please enter here to search: ") 
+        global max_de_time
+        google = 0
+        naver = 0
+        daum = 0
+
+        _src = input("Please enter here to search: ")
+        while True :
+            site = input("site: ")
+            if site == 'google':
+                google = 1
+                max_de_time = 3
+                break
+
+            elif site == 'naver':
+                naver = 1
+                break
+
+            elif site == 'daum':
+                daum = 1
+                break
+
+            elif site == 'all':
+                google = 1
+                naver = 1
+                daum = 1
+                break
+            
+            elif site == 'stop()':
+                break
+                
+            elif site == 're()':
+                _src = input("Please enter here to search: ")
+                if _src == "stop()":
+                    break
+
+            else:
+                print('re')
+            
+
         s_t = time.time()
-        if _src == ' ' or _src == '' or _src == 'stop()':
+        if _src == ' ' or _src == '' or _src == 'stop()' or site == 'stop()':
             return print('stop')
 
         del_st = '관련 검색: ' + _src
-        links_google = get_link_google(_src)
-        links_naver = get_link_naver(_src)
-        links_daum = get_link_daum(_src)
+        if google == 1:
+            links_google = get_link_google(_src)
+
+        if naver == 1:
+            links_naver = get_link_naver(_src)
         
-        print(f'delay req: {de_time}')
+        if daum == 1:
+            links_daum = get_link_daum(_src)
+
+        print(f'min delay req: {min_de_time}')
+        print(f'max delay req: {max_de_time}')
         print(f'Total processes: {processes_num}')
-        print(f"Total pages google: {len(links_google)}")
-        print(f"Total pages naver: {len(links_naver)}")
-        print(f"Total pages daum: {len(links_daum)}")
+
+        if google == 1:
+            print(f"Total pages google: {len(links_google)}")
+        
+        if naver == 1:
+            print(f"Total pages naver: {len(links_naver)}")
+    
+        if daum == 1:
+            print(f"Total pages daum: {len(links_daum)}")
         
         result = dict()
         # data_naver = list(map(get_rsc_naver,links_naver[:len(links_naver)]))
         # data_google = list(map(get_rsc_google,links_google[:len(links_google)]))
         pool = Pool(processes=processes_num)
         data = list()
-        try:
-            print('start google search')
-            data += pool.map(get_rsc_google,links_google[:len(links_google)])
-            print('complete google search')
-        except TypeError:
-            print('requests error \a')
 
-        try:
-            print('start naver search')
-            data += pool.map(get_rsc_naver,links_naver[:len(links_naver)])
-            print('complete naver search')
-        except TypeError:
-            print('requests error \a')
+        if google == 1:
+            try:
+                print('start google search')
+                data += pool.map(get_rsc_google,links_google[:len(links_google)])
+                print('complete google search')
+            except TypeError:
+                print('requests error \a')
+                while True:
+                    re = input("re? : ")
+                    if re.lower() == 'y' or re.lower() == 'yes':
+                        try:
+                            print('start google search')
+                            data += pool.map(get_rsc_google,links_google[:len(links_google)])
+                            print('complete google search')
+                        except TypeError:
+                            print('requests error \a')
 
-        try:
-            print('start daum search')
-            data += pool.map(get_rsc_daum,links_daum[:len(links_daum)])
-            print('complete daum search')
-        except TypeError:
-            print('requests error \a')
+                        break
+                    elif re.lower() == 'n' or re.lower() == 'no':
+                        print('pass')
+                        break
+                    else:
+                        print('re')
+            google = 0
+
+        if naver == 1:
+            try:
+                print('start naver search')
+                data += pool.map(get_rsc_naver,links_naver[:len(links_naver)])
+                print('complete naver search')
+            except TypeError:
+                print('requests error \a')
+                while True:
+                    re = input("re? : ")
+                    if re.lower() == 'y' or re.lower() == 'yes':
+                        try:
+                            print('start naver search')
+                            data += pool.map(get_rsc_naver,links_naver[:len(links_naver)])
+                            print('complete naver search')
+                        except TypeError:
+                            print('requests error \a')
+
+                        break
+                    elif re.lower() == 'n' or re.lower() == 'no':
+                        print('pass')
+                        break
+                    else:
+                        print('re')
+
+                
+            naver = 0
+
+        if daum == 1:
+
+            try:
+                print('start daum search')
+                data += pool.map(get_rsc_daum,links_daum[:len(links_daum)])
+                print('complete daum search')
+            except TypeError:
+                print('requests error \a')
+                while True:
+                    re = input("re? : ")
+                    if re.lower() == 'y' or re.lower() == 'yes':
+                        try:
+                            print('start daum search')
+                            data += pool.map(get_rsc_daum,links_daum[:len(links_daum)])
+                            print('complete daum search')
+                        except TypeError:
+                            print('requests error \a')
+
+                        break
+                    elif re.lower() == 'n' or re.lower() == 'no':
+                        print('pass')
+                        break
+                    else:
+                        print('re')
+            daum = 0
          
         print('sum result..')
         for num in range(0,len(data)):
             for i in data[num]:
-                if i != del_st and _src in i and data[num][i] != None:
+                if i != del_st and _src in i.lower() and data[num][i] != None:
                     result[i] = data[num][i]
         
         e_t = time.time()
+
         print('result..')
-        print(result)
-        print(f"{e_t - s_t} s...")
         print(len(result))
+        print(f"{e_t - s_t} s...")
+
+        while True:
+            csv_fi = input('make xlsx files? : ')
+            # csv_fi = 'y'
+            if csv_fi.lower() == 'y' or csv_fi.lower() == 'yes':
+                with open('data.csv', 'w', encoding= 'utf-8', newline='') as make:
+                    wt = csv.writer(make)
+                    wt.writerow(['search', 'URL'])
+                    for res_data in result.items():
+                        wt.writerow(res_data)
+         
+                for csvfile in glob.glob(os.path.join('.', '*.csv')):
+                    workbook = Workbook(csvfile[:-4] + '.xlsx')
+                    worksheet = workbook.add_worksheet()
+                    with open(csvfile, 'rt', encoding='utf8') as f:
+                        reader = csv.reader(f)
+                        for r, row in enumerate(reader):
+                            for c, col in enumerate(row):
+                                cols = 3 * len(col)
+                                if len(col) <= cols:
+                                    worksheet.set_column('A:A', cols)
+                                worksheet.write(r, c, col)
+                    workbook.close()
+            
+                    
+                # os.remove('data.csv')
+                break
+
+            elif csv_fi.lower() == 'n' or csv_fi.lower() == 'no':
+                break
+            else:
+                print('re')
+
+        # print_res = input('print result? : ')
+        # if print_res.lower() == 'y' or print_res.lower() == 'yes':
+        #     print(result)
+           
+        
         # return result
 
 res()
-
 # ch()
 

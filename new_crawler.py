@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from multiprocessing import Pool
 from xlsxwriter.workbook import Workbook
-import win32com.client as win32
 import glob
 import os
 import requests
@@ -343,28 +342,26 @@ def res():
                         reader = csv.reader(f)
                         for r, row in enumerate(reader):
                             for c, col in enumerate(row):
-                                cols = 3 * len(col)
-                                if len(col) <= cols:
+                                cols =  0
+                                if len(col) >= cols:
+                                    worksheet.set_column('A:A', len(col))
+                                    cols = len(col)
+                                else:
                                     worksheet.set_column('A:A', cols)
+                                
                                 worksheet.write(r, c, col)
                     workbook.close()
             
                     
-                # os.remove('data.csv')
+                os.remove('data.csv')
                 break
 
             elif csv_fi.lower() == 'n' or csv_fi.lower() == 'no':
                 break
             else:
                 print('re')
-
-        # print_res = input('print result? : ')
-        # if print_res.lower() == 'y' or print_res.lower() == 'yes':
-        #     print(result)
            
-        
         # return result
 
 res()
 # ch()
-

@@ -15,3 +15,5 @@ pip install requests
 pip install selenium
 
 pip install xlsxwriter
+
+pip install csv

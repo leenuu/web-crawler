@@ -1,5 +1,3 @@
-from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from multiprocessing import Pool
@@ -7,11 +5,9 @@ from xlsxwriter.workbook import Workbook
 import glob
 import os
 import requests
-import webbrowser
 import time
 import random
 import csv
-
 
 _src = ''
 max_de_time = 30
@@ -27,8 +23,8 @@ def ch():
     print(html)
 
 
-def get_link_google(src):
-    url_google_data = list()
+def get_links(src):
+    url_data = list()
     ua = UserAgent()
     header = {'User-Agent':str(ua.chrome)}
     url_ = [f'https://www.google.com/search?q={src}', f'https://www.google.com/search?q={src} site:blog.naver.com', f'https://www.google.com/search?q={src} site:tistory.com']
@@ -45,15 +41,19 @@ def get_link_google(src):
             return 0
         soup = BeautifulSoup(html, 'html.parser')
         
-        url_google_data.append('/search?q=' + src)
+        url_data.append('/search?q=' + src)
         for _url in soup.find('div', id="foot", role="navigation") and soup.find('table', class_='AaVjTc') and soup.find_all('td') and soup.find_all('a', class_="fl") and soup.find_all('span', class_="SJajHc NVbCr"):
-            url_google_data.append(_url.parent.get('href'))
-        del url_google_data[len(url_google_data)-1]
+            url_data.append(_url.parent.get('href'))
+        del url_data[len(url_data)-1]
 
     print('complete get links..')
-    return url_google_data
+    return url_data
 
 def get_rsc_google(link):
+    rsc_name_data = list()
+    rsc_url_data = list()
+    rsc_data = dict()
+
     print('start get rsc...')
     ua = UserAgent()
     header = {'User-Agent':str(ua.chrome)}
@@ -70,18 +70,14 @@ def get_rsc_google(link):
         return 0
     soup = BeautifulSoup(html, 'html.parser')
 
-    rsc_name_data = list()
-    rsc_url_data = list()
-    rsc_google_data = dict()
     for link in soup.find_all("div", class_ = 'r') and soup.find_all('a') and soup.find_all('h3'):
         rsc_url_data.append(link.parent.get('href'))
         rsc_name_data.append(link.get_text())
             
     for num in range(0,len(rsc_name_data)):
-        rsc_google_data[rsc_name_data[num]] = rsc_url_data[num]
+        rsc_data[rsc_name_data[num]] = rsc_url_data[num]
     print('complete get src..')
-    return rsc_google_data
-
+    return rsc_data
 
 def res():
     if __name__ == '__main__':
@@ -99,27 +95,27 @@ def res():
         s_t = time.time()
         del_st = '관련 검색: ' + _src
         
-        links_google = get_link_google(_src)
+        links_ = get_links(_src)
 
         print(f'min delay req: {min_de_time}')
         print(f'max delay req: {max_de_time}')
         print(f'Total processes: {processes_num}')
-        print(f"Total pages: {len(links_google)}")
+        print(f"Total pages: {len(links_)}")
 
 
         try:
-            print('start google search')
-            data += pool.map(get_rsc_google,links_google[:len(links_google)])
-            print('complete google search')
+            print('start search')
+            data += pool.map(get_rsc_google,links_[:len(links_)])
+            print('complete search')
         except TypeError:
             print('requests error \a')
             while True:
                 re = input("re? : ")
                 if re.lower() == 'y' or re.lower() == 'yes':
                     try:
-                        print('start google search')
-                        data += pool.map(get_rsc_google,links_google[:len(links_google)])
-                        print('complete google search')
+                        print('start search')
+                        data += pool.map(get_rsc_google,links_[:len(links_)])
+                        print('complete search')
                     except TypeError:
                         print('requests error \a')
                     break
@@ -170,7 +166,6 @@ def res():
                                     else:
                                         worksheet.set_column('A:A', cols)
                                 # print(r,c)
-                                
                                 worksheet.write(r, c, col)
                     workbook.close()
             
@@ -181,8 +176,7 @@ def res():
                 break
             else:
                 print('re')
-           
         # return result
 
-# res()
-ch()
+res()
+# ch()
